@@ -205,7 +205,7 @@ h1{font-size:clamp(26px,6vw,40px);text-align:center;margin:8px 0 16px}
 /* ---------- なかま（アバター） ---------- */
 .ava{position:relative;width:var(--s);height:var(--s);border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;background:var(--need);overflow:visible}
 .ava .ch{font-size:calc(var(--s)*.6);line-height:1}
-.ava .hd{position:absolute;top:-4%;left:50%;transform:translateX(-50%) rotate(-8deg);font-size:calc(var(--s)*.34);line-height:1}
+.ava .hd{position:absolute;z-index:2;line-height:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
 .ava .hn{position:absolute;right:-4%;bottom:2%;font-size:calc(var(--s)*.32);line-height:1;transform:rotate(12deg)}
 .ava.bg-sky{background:linear-gradient(#a9dcff,#e8f6ff)}
 .ava.bg-rainbow{background:linear-gradient(160deg,#ffb3b3,#ffd9a0,#fff3a0,#b8f0b0,#a9dcff,#d6b8ff)}
@@ -531,9 +531,12 @@ const CHARS = [
 ];
 const SLOTS = [['head', 'あたま'], ['hand', 'て に もつ もの'], ['bg', 'はいけい']];
 const ITEMS = [
-  { id: 'ribbon', slot: 'head', e: '🎀', n: 'リボン', s: 5 }, { id: 'cap', slot: 'head', e: '🧢', n: 'ぼうし', s: 15 },
-  { id: 'silk', slot: 'head', e: '🎩', n: 'シルクハット', s: 40 }, { id: 'straw', slot: 'head', e: '👒', n: 'むぎわらぼうし', s: 60 },
-  { id: 'crown', slot: 'head', e: '👑', n: 'おうかん', s: 160 },
+  // p = [よこ%（ひだりから）, たて%（うえから）, おおきさ（まるの なんぶん）, かたむき°]：あたまに かさなる いち
+  { id: 'ribbon', slot: 'head', e: '🎀', n: 'リボン', s: 5, p: [70, 11, .34, 18] },
+  { id: 'cap', slot: 'head', e: '🧢', n: 'ぼうし', s: 15, p: [50, 4, .42, -4] },
+  { id: 'silk', slot: 'head', e: '🎩', n: 'シルクハット', s: 40, p: [50, 0, .44, -5] },
+  { id: 'straw', slot: 'head', e: '👒', n: 'むぎわらぼうし', s: 60, p: [50, -5, .42, -3] },
+  { id: 'crown', slot: 'head', e: '👑', n: 'おうかん', s: 160, p: [50, 5, .36, -4] },
   { id: 'tulip', slot: 'hand', e: '🌷', n: 'チューリップ', s: 8 }, { id: 'balloon', slot: 'hand', e: '🎈', n: 'ふうせん', s: 30 },
   { id: 'candy', slot: 'hand', e: '🍭', n: 'キャンディ', s: 55 }, { id: 'wand', slot: 'hand', e: '🪄', n: 'まほうのつえ', s: 110 },
   { id: 'trophy', slot: 'hand', e: '🏆', n: 'トロフィー', s: 220 },
@@ -546,7 +549,7 @@ const itemOf = id => ITEMS.find(x => x.id === id);
 function avatar(size, cls = '') {
   const w = game.wear, hd = itemOf(w.head), hn = itemOf(w.hand), bg = itemOf(w.bg);
   return `<div class="ava ${bg ? 'bg-' + bg.id : ''} ${cls}" style="--s:${size}px"><span class="ch">${game.char}</span>` +
-    (hd ? `<span class="hd">${hd.e}</span>` : '') + (hn ? `<span class="hn">${hn.e}</span>` : '') + '</div>';
+    (hd ? `<span class="hd" style="left:${hd.p[0]}%;top:${hd.p[1]}%;font-size:calc(var(--s)*${hd.p[2]});transform:translateX(-50%) rotate(${hd.p[3]}deg)">${hd.e}</span>` : '') + (hn ? `<span class="hn">${hn.e}</span>` : '') + '</div>';
 }
 function nextUnlock() {
   return [...CHARS, ...ITEMS].filter(x => x.s > game.stars).sort((a, b) => a.s - b.s)[0];
